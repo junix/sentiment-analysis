@@ -19,7 +19,7 @@ def train_and_dump(min_count=5):
 
 
 def do_train(net):
-    optimizer = optim.SGD(net.parameters(), lr=1e-2)
+    optimizer = optim.SGD(net.parameters(), lr=1e-4)
     criterion = nn.BCEWithLogitsLoss()
     train_dataset = DataLoader(list(read_imdb(seg='train')), batch_size=1, shuffle=True)
     test_dataset = DataLoader(list(read_imdb(seg='test')), batch_size=1, shuffle=False)
