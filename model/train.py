@@ -39,6 +39,6 @@ def do_train(net):
             if total_count % 1000 == 0:
                 print(total_loss)
                 total_loss = .0
-            if total_count % 40000 == 0:
+            if total_count % 5000 == 0:
                 net.dump(dump_path)
     net.dump(dump_path)
