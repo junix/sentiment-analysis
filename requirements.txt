@@ -1,0 +1,4 @@
+torch
+numpy
+jieba
+yxt-nlp-toolkit
