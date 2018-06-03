@@ -28,6 +28,7 @@ def do_train(net):
     for epoch in range(5):
         for text, label in train_dataset:
             text = text[0]
+            net.zero_grad()
             hidden = net.init_hidden()
             score = net(text, hidden)
             label = label.view(score.shape).to(run_device(), dtype=torch.float)
