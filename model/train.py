@@ -3,23 +3,32 @@ import torch
 import torch.optim as optim
 import torch.nn as nn
 from torch.utils.data.dataloader import DataLoader
+
+from yxt_nlp_toolkit.embedding.general import WordEmbedding
+
 from dataset.imdb import *
 from conf import run_device
 from .net import Net
 
 dump_path = os.path.dirname(os.path.abspath(__file__)) + '/model.pt'
+_glove_path = os.path.expanduser('~/nlp/glove.6B.200d.txt')
 
 
 def train_and_dump(min_count=5):
     lang = get_lang(min_count=min_count)
     net = Net(lang=lang)
+    embedding = WordEmbedding(_glove_path)
+    weight = net.embedding.weight.detach_().cpu().numpy()
+    lang.build_embedding(wv=embedding, out_embedding=weight)
+    net.embedding.weight.data = torch.tensor(weight, dtype=torch.float)
+
     net.train()
     net.move_to_device(run_device())
     do_train(net)
 
 
 def do_train(net):
-    optimizer = optim.SGD(net.parameters(), lr=1e-4)
+    optimizer = optim.SGD(net.params_without_embedding(), lr=1e-4)
     criterion = nn.BCEWithLogitsLoss()
     train_dataset = DataLoader(list(read_imdb(seg='train')), batch_size=1, shuffle=True)
     test_dataset = DataLoader(list(read_imdb(seg='test')), batch_size=1, shuffle=False)

@@ -39,11 +39,17 @@ class Net(nn.Module):
         words = self.lang.to_indices(words)
         assert len(words) > 0, "len(words) should > 0"
         words = torch.tensor(words, dtype=torch.long, device=run_device())
-        input = self.embedding(words).view(len(words), 1, -1)
+        with torch.no_grad():
+            input = self.embedding(words).view(len(words), 1, -1)
         output, hidden = self.lstm(input, hidden)
         output = output[-1].view(-1)
         score = self.decoder(output)
         return score
+
+    def params_without_embedding(self):
+        for name, para in self.named_parameters():
+            if 'embedding' not in name:
+                yield para
 
     def __repr__(self):
         return '<Net>'
