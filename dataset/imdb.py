@@ -3,7 +3,7 @@ import os
 from yxt_nlp_toolkit.common import Vocab, Lang
 from yxt_nlp_toolkit.utils import token_stream
 
-_dataset_dir = '/Users/junix/nlp/dataset/aclImdb'
+_dataset_dir = os.path.expanduser('~/nlp/dataset/aclImdb')
 
 POS_LABEL, NEG_LABEL = 1, 0
 
