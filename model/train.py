@@ -31,7 +31,7 @@ def do_train(net):
     optimizer = optim.SGD(net.params_without_embedding(), lr=1e-4)
     criterion = nn.BCEWithLogitsLoss()
     train_dataset = DataLoader(list(read_imdb(seg='train')), batch_size=1, shuffle=True)
-    test_dataset = DataLoader(list(read_imdb(seg='test')), batch_size=1, shuffle=False)
+    test_dataset = DataLoader(list(read_imdb(seg='test')), batch_size=1, shuffle=True)
     total_count = 0
     total_loss = .0
     for epoch in range(5):
