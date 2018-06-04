@@ -10,13 +10,16 @@ dump_path = os.path.dirname(os.path.abspath(__file__)) + '/model.pt'
 _glove_path = os.path.expanduser('~/nlp/glove.6B.200d.txt')
 
 
-def train_and_dump(min_count=5, lr=1e-4):
-    lang = get_lang(min_count=min_count)
-    net = Net(lang=lang)
-    embedding = WordEmbedding(_glove_path)
-    weight = net.embedding.weight.detach_().cpu().numpy()
-    lang.build_embedding(wv=embedding, out_embedding=weight)
-    net.embedding.weight.data = torch.tensor(weight, dtype=torch.float)
+def train_and_dump(from_model=None, min_count=5, lr=1e-4):
+    if from_model:
+        net = Net.load(from_model)
+    else:
+        lang = get_lang(min_count=min_count)
+        net = Net(lang=lang)
+        embedding = WordEmbedding(_glove_path)
+        weight = net.embedding.weight.detach_().cpu().numpy()
+        lang.build_embedding(wv=embedding, out_embedding=weight)
+        net.embedding.weight.data = torch.tensor(weight, dtype=torch.float)
 
     net.move_to_device(run_device())
     do_train(net, lr)
