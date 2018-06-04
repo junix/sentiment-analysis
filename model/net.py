@@ -34,11 +34,13 @@ class Net(nn.Module):
             torch.zeros(self.rnn_num_layers * bidirect, 1, self.hidden_size, device=run_device())
         )
 
-    def forward(self, text, hidden):
-        words = tokenizer(text=text, use_lib='naive')
-        words = self.lang.to_indices(words)
-        assert len(words) > 0, "len(words) should > 0"
-        words = torch.tensor(words, dtype=torch.long, device=run_device())
+    def forward(self, words, hidden):
+        if isinstance(words, str):
+            words = tokenizer(text=words, use_lib='naive')
+            words = self.lang.to_indices(words)
+            assert len(words) > 0, "len(words) should > 0"
+            words = torch.tensor(words, dtype=torch.long, device=run_device())
+        words = words.view(-1).to(run_device(), dtype=torch.long)
         with torch.no_grad():
             input = self.embedding(words).view(len(words), 1, -1)
         output, hidden = self.lstm(input, hidden)

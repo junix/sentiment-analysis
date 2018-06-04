@@ -5,6 +5,7 @@ import torch.nn as nn
 from torch.utils.data.dataloader import DataLoader
 
 from yxt_nlp_toolkit.embedding.general import WordEmbedding
+from yxt_nlp_toolkit.utils import tokenizer
 
 from dataset.imdb import *
 from conf import run_device
@@ -27,17 +28,23 @@ def train_and_dump(min_count=5):
     do_train(net)
 
 
+def text_to_indices(text, lang):
+    words = tokenizer(text=text, use_lib='naive')
+    return lang.to_indices(words)
+
+
 def do_train(net):
     optimizer = optim.SGD(net.params_without_embedding(), lr=1e-4)
     criterion = nn.BCEWithLogitsLoss()
-    train_dataset = DataLoader(list(read_imdb(seg='train')), batch_size=1, shuffle=True)
-    test_dataset = DataLoader(list(read_imdb(seg='test')), batch_size=1, shuffle=True)
+    train_dataset = DataLoader([(text_to_indices(text, net.lang), label)
+                                for text, label in read_imdb(seg='train')], batch_size=1, shuffle=True)
+    test_dataset = DataLoader([(text_to_indices(text, net.lang), label)
+                               for text, label in read_imdb(seg='test')], batch_size=1, shuffle=True)
     total_count = 0
     total_loss = .0
     for epoch in range(5):
         for text, label in train_dataset:
             net.train()
-            text = text[0]
             net.zero_grad()
             hidden = net.init_hidden()
             score = net(text, hidden)
