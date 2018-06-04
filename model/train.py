@@ -43,7 +43,7 @@ def do_train(net, lr):
             total_loss += loss.detach_().item()
             total_count += 1
             if total_count % 1000 == 0:
-                print(total_loss)
+                print(total_count, '=>', total_loss)
                 total_loss = .0
             if total_count % 20000 == 0:
                 print('accu=', accu(net, test_dataset))
