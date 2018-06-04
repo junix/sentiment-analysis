@@ -6,19 +6,28 @@ from conf import run_device
 
 
 class Net(nn.Module):
-    def __init__(self, lang, embedding_dim=200, hidden_size=512):
+    def __init__(self, lang, embedding_dim=200, hidden_size=512, rnn_type="gru"):
         super(Net, self).__init__()
         self.rnn_num_layers = 2
         self.rnn_bidirectional = True
         self.hidden_size = hidden_size
         self.lang = lang
         self.embedding = nn.Embedding(num_embeddings=lang.vocab_size, embedding_dim=embedding_dim)
-        self.lstm = nn.LSTM(
-            input_size=embedding_dim,
-            hidden_size=self.hidden_size,
-            dropout=0.5,
-            num_layers=self.rnn_num_layers,
-            bidirectional=self.rnn_bidirectional)
+        self.rnn_type = rnn_type
+        if rnn_type == "lstm":
+            self.rnn = nn.LSTM(
+                input_size=embedding_dim,
+                hidden_size=self.hidden_size,
+                dropout=0.5,
+                num_layers=self.rnn_num_layers,
+                bidirectional=self.rnn_bidirectional)
+        else:
+            self.rnn = nn.GRU(
+                input_size=embedding_dim,
+                hidden_size=self.hidden_size,
+                dropout=0.5,
+                num_layers=self.rnn_num_layers,
+                bidirectional=self.rnn_bidirectional)
         self.decoder = nn.Linear(hidden_size * 2 if self.rnn_bidirectional else 1, out_features=1)
 
     def move_to_device(self, device):
@@ -29,10 +38,13 @@ class Net(nn.Module):
 
     def init_hidden(self):
         bidirect = 2 if self.rnn_bidirectional else 1
-        return (
-            torch.zeros(self.rnn_num_layers * bidirect, 1, self.hidden_size, device=run_device()),
-            torch.zeros(self.rnn_num_layers * bidirect, 1, self.hidden_size, device=run_device())
-        )
+        if self.rnn_type == "lsmt":
+            return (
+                torch.zeros(self.rnn_num_layers * bidirect, 1, self.hidden_size, device=run_device()),
+                torch.zeros(self.rnn_num_layers * bidirect, 1, self.hidden_size, device=run_device())
+            )
+        else:
+            return torch.zeros(self.rnn_num_layers * bidirect, 1, self.hidden_size, device=run_device())
 
     def forward(self, words, hidden):
         if isinstance(words, str):
@@ -43,7 +55,7 @@ class Net(nn.Module):
         words = words.to(run_device()).view(-1)
         with torch.no_grad():
             input = self.embedding(words).view(len(words), 1, -1)
-        output, hidden = self.lstm(input, hidden)
+        output, hidden = self.rnn(input, hidden)
         output = output[-1].view(-1)
         score = self.decoder(output)
         return score
