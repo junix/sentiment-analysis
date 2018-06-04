@@ -7,7 +7,7 @@ from dataset.imdb import *
 from .net import Net
 from .predict import predict
 
-dump_path = os.path.dirname(os.path.abspath(__file__)) + '/model.pt'
+dump_path = os.path.join(os.path.dirname(__file__), 'model.pt')
 _glove_path = os.path.expanduser('~/nlp/glove.6B.200d.txt')
 
 
