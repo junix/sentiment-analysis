@@ -33,6 +33,7 @@ def do_train(net):
     criterion = nn.BCEWithLogitsLoss()
     train_dataset = load_dataset(net.lang, seg='train')
     test_dataset = load_dataset(net.lang, seg='test')
+    print('load dataset ok')
     total_count = 0
     total_loss = .0
     for epoch in range(5):
@@ -47,10 +48,10 @@ def do_train(net):
             optimizer.step()
             total_loss += loss.detach_().item()
             total_count += 1
-            if total_count % 1000 == 0:
+            if total_count % 10000 == 0:
                 print(total_loss, 'accu=', accu(net, test_dataset))
                 total_loss = .0
-            if total_count % 5000 == 0:
+            if total_count % 20000 == 0:
                 net.dump(dump_path)
     net.dump(dump_path)
 
