@@ -48,10 +48,11 @@ def do_train(net):
             optimizer.step()
             total_loss += loss.detach_().item()
             total_count += 1
-            if total_count % 10000 == 0:
-                print(total_loss, 'accu=', accu(net, test_dataset))
+            if total_count % 1000 == 0:
+                print(total_loss)
                 total_loss = .0
             if total_count % 20000 == 0:
+                print('accu=', accu(net, test_dataset))
                 net.dump(dump_path)
     net.dump(dump_path)
 
