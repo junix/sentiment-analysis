@@ -39,8 +39,8 @@ class Net(nn.Module):
             words = tokenizer(text=words, use_lib='naive')
             words = self.lang.to_indices(words)
             assert len(words) > 0, "len(words) should > 0"
-            words = torch.tensor(words, dtype=torch.long, device=run_device())
-        words = words.view(-1).to(run_device(), dtype=torch.long)
+        words = torch.tensor(words, dtype=torch.long, device=run_device())
+        words = words.view(-1)
         with torch.no_grad():
             input = self.embedding(words).view(len(words), 1, -1)
         output, hidden = self.lstm(input, hidden)
