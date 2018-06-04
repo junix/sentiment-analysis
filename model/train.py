@@ -18,9 +18,7 @@ def train_and_dump(from_model=None, min_count=5, lr=1e-4):
         lang = get_lang(min_count=min_count)
         net = Net(lang=lang)
         embedding = WordEmbedding(_glove_path)
-        weight = net.embedding.weight.detach_().cpu().numpy()
-        lang.build_embedding(wv=embedding, out_embedding=weight)
-        net.embedding.weight.data = torch.tensor(weight, dtype=torch.float)
+        net.init_params(pre_trained_wv=embedding)
 
     net.move_to_device(run_device())
     do_train(net, lr)

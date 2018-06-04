@@ -46,6 +46,17 @@ class Net(nn.Module):
         else:
             return torch.zeros(self.rnn_num_layers * bidirect, 1, self.hidden_size, device=run_device())
 
+    def init_params(self, pre_trained_wv=None):
+        for name, param in self.named_parameters():
+            if 'bias' in name:
+                nn.init.constant_(param, .0)
+            elif 'weight' in name:
+                nn.init.xavier_normal_(param)
+        if pre_trained_wv is not None:
+            weight = self.embedding.weight.detach_().cpu().numpy()
+            self.lang.build_embedding(wv=pre_trained_wv, out_embedding=weight)
+            self.embedding.weight.data = torch.tensor(weight, dtype=torch.float)
+
     def forward(self, words, hidden):
         if isinstance(words, str):
             words = tokenizer(text=words, use_lib='naive')
