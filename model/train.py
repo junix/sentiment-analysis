@@ -1,3 +1,4 @@
+import time
 import torch.nn as nn
 import torch.optim as optim
 from yxt_nlp_toolkit.embedding.general import WordEmbedding
@@ -32,7 +33,7 @@ def do_train(net, lr):
     test_dataset = load_dataset(net.lang, seg='test')
     print('load dataset ok')
     total_count = 0
-    total_loss = .0
+    total_loss, started_at = .0, int(time.time())
     for epoch in range(15):
         for text, label in train_dataset:
             net.train()
@@ -46,8 +47,9 @@ def do_train(net, lr):
             total_loss += loss.detach_().item()
             total_count += 1
             if total_count % 1000 == 0:
-                print(total_count, '=>', total_loss)
-                total_loss = .0
+                current = int(time.time())
+                print(total_count, '=>', total_loss, 'consumed:', current - started_at, 'second')
+                total_loss, started_at = .0, current
             if total_count % 20000 == 0:
                 print('accu=', accu(net, test_dataset))
                 net.dump(dump_path)
