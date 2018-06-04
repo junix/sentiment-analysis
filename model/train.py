@@ -16,7 +16,7 @@ dump_path = os.path.dirname(os.path.abspath(__file__)) + '/model.pt'
 _glove_path = os.path.expanduser('~/nlp/glove.6B.200d.txt')
 
 
-def train_and_dump(min_count=5):
+def train_and_dump(min_count=5, lr=1e-4):
     lang = get_lang(min_count=min_count)
     net = Net(lang=lang)
     embedding = WordEmbedding(_glove_path)
@@ -25,18 +25,18 @@ def train_and_dump(min_count=5):
     net.embedding.weight.data = torch.tensor(weight, dtype=torch.float)
 
     net.move_to_device(run_device())
-    do_train(net)
+    do_train(net, lr)
 
 
-def do_train(net):
-    optimizer = optim.SGD(net.params_without_embedding(), lr=1e-4)
+def do_train(net, lr):
+    optimizer = optim.SGD(net.params_without_embedding(), lr=lr)
     criterion = nn.BCEWithLogitsLoss()
     train_dataset = load_dataset(net.lang, seg='train')
     test_dataset = load_dataset(net.lang, seg='test')
     print('load dataset ok')
     total_count = 0
     total_loss = .0
-    for epoch in range(5):
+    for epoch in range(15):
         for text, label in train_dataset:
             net.train()
             net.zero_grad()
