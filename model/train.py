@@ -1,14 +1,8 @@
-import os
-import torch
-import torch.optim as optim
 import torch.nn as nn
-from torch.utils.data.dataloader import DataLoader
-
+import torch.optim as optim
 from yxt_nlp_toolkit.embedding.general import WordEmbedding
-from yxt_nlp_toolkit.utils import tokenizer
 
 from dataset.imdb import *
-from conf import run_device
 from .net import Net
 from .predict import predict
 
