@@ -5,6 +5,7 @@ from torch.utils.data.dataloader import DataLoader
 
 from yxt_nlp_toolkit.common import Vocab, Lang
 from yxt_nlp_toolkit.utils import token_stream, tokenizer
+from conf import run_device
 
 _dataset_dir = os.path.expanduser('~/nlp/dataset/aclImdb')
 
@@ -33,9 +34,11 @@ def text_to_indices(text, lang):
     return lang.to_indices(words)
 
 
-def load_dataset(lang, seg='train'):
-    return DataLoader([(torch.tensor(text_to_indices(text, lang)), label)
-                       for text, label in read_imdb(seg=seg)], batch_size=1, shuffle=True)
+def load_dataset(lang, seg='train', move_to_run_device=False):
+    device = run_device() if move_to_run_device else torch.device('cpu')
+    return DataLoader([
+        (torch.tensor(text_to_indices(text, lang), device=device), label)
+        for text, label in read_imdb(seg=seg)], batch_size=1, shuffle=True)
 
 
 def read_vocab(min_count=1):

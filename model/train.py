@@ -31,7 +31,7 @@ def train_and_dump(min_count=5, lr=1e-4):
 def do_train(net, lr):
     optimizer = optim.SGD(net.params_without_embedding(), lr=lr)
     criterion = nn.BCEWithLogitsLoss()
-    train_dataset = load_dataset(net.lang, seg='train')
+    train_dataset = load_dataset(net.lang, seg='train', move_to_run_device=True)
     test_dataset = load_dataset(net.lang, seg='test')
     print('load dataset ok')
     total_count = 0
