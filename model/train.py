@@ -30,8 +30,7 @@ def do_train(net, lr):
     train_dataset = load_dataset(net.lang, seg='train', move_to_run_device=True)
     test_dataset = load_dataset(net.lang, seg='test')
     print('load dataset ok')
-    total_count = 0
-    total_loss, started_at = .0, int(time.time())
+    total_count, total_loss, started_at = 0, .0, int(time.time())
     for epoch in range(15):
         for text, label in train_dataset:
             net.train()
@@ -51,7 +50,7 @@ def do_train(net, lr):
             if total_count % 20000 == 0:
                 print('accu=', accu(net, test_dataset))
                 net.dump(dump_path)
-    net.dump(dump_path)
+        net.dump(dump_path)
 
 
 def accu(net, test_dataset):
